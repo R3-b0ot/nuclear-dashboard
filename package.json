@@ -1,0 +1,30 @@
+{
+  "name": "nuclear-dashboard",
+  "version": "0.1.0",
+  "description": "A Spotify-inspired, region-aware dashboard provider for Nuclear Music Player.",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "pack": "node scripts/pack.mjs"
+  },
+  "dependencies": {
+    "@nuclearplayer/plugin-sdk": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vitest": "^3.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/R3-b0ot/nuclear-dashboard.git"
+  },
+  "license": "MIT",
+  "keywords": ["nuclear", "nuclear-player", "plugin", "dashboard", "music", "spotify-inspired", "india"]
+}
