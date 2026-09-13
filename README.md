@@ -1,15 +1,15 @@
 # Nuclear Dashboard
 
-A Spotify-inspired, region-aware dashboard plugin for [Nuclear Music Player](https://github.com/nukeop/nuclear).
+A Spotify-inspired, region-aware discovery dashboard plugin for [Nuclear Music Player](https://github.com/nukeop/nuclear).
 
-> Early development — the first milestone establishes the plugin contract and India regional profile. The visual dashboard layer will follow once the host extension boundary is confirmed.
+> Early development — the first working data milestone establishes the plugin contract, persisted region preference, and India discovery adapter. The visual dashboard layer will follow once the host extension boundary is confirmed.
 
 ## Goals
 
 - Spotify-inspired information architecture without copying Spotify branding or assets.
 - Region-aware discovery, starting with India.
 - Local-first personalization where Nuclear exposes the required data.
-- Provider-agnostic adapters so the dashboard is not tied to one music service.
+- Provider-agnostic architecture so regional sources can be swapped or combined.
 - A clean standalone repository that can be released through Nuclear's plugin registry.
 
 ## Planned sections
@@ -29,21 +29,27 @@ A Spotify-inspired, region-aware dashboard plugin for [Nuclear Music Player](htt
 ```bash
 npm install
 npm run typecheck
-npm run build
+npm test
 ```
 
-The plugin currently registers `nuclear-dashboard` and an India regional profile. No external API key is required at this stage.
+The plugin registers `nuclear-dashboard` and persists a dashboard region preference. India is the first region profile. The first discovery adapter uses public Deezer search data and does not require an API key.
 
 ## Architecture
 
-Nuclear's current dashboard SDK exposes providers for top tracks, top artists, top albums, editorial playlists, and new releases. The host renders those provider results into its dashboard. This project therefore keeps the regional/data layer separate from the eventual dashboard presentation layer.
+Nuclear's current dashboard SDK exposes providers for top tracks, top artists, top albums, editorial playlists, and new releases. The host renders those provider results into its dashboard. This project therefore keeps regional data acquisition separate from the eventual dashboard presentation layer.
+
+The region layer is deliberately independent of the data source. Adding another market should only require a new region profile and, where necessary, source-specific discovery rules.
 
 ## Status
 
 - [x] Repository scaffold
 - [x] Nuclear SDK provider entrypoint
 - [x] India region model
-- [ ] Regional data adapters
+- [x] Persisted region setting
+- [x] First regional discovery adapter
+- [x] Typecheck/test CI workflow
+- [ ] More regional profiles
+- [ ] Top artists / albums / playlists adapters
 - [ ] Personalization/history integration
 - [ ] Spotify-inspired dashboard presentation
 - [ ] Local installation package
