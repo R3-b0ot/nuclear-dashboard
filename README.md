@@ -2,7 +2,7 @@
 
 A Spotify-inspired, region-aware discovery dashboard plugin for [Nuclear Music Player](https://github.com/nukeop/nuclear).
 
-> Early development — the first working data milestone establishes the plugin contract, persisted region preference, and India discovery adapter. The visual dashboard layer will follow once the host extension boundary is confirmed.
+> v0.2.0 — the first release-ready data milestone establishes the plugin contract, persisted region preference, India discovery adapter, CI validation, and release packaging workflow. The visual dashboard layer will follow once the host extension boundary is confirmed.
 
 ## Goals
 
@@ -48,12 +48,12 @@ The region layer is deliberately independent of the data source. Adding another 
 - [x] Persisted region setting
 - [x] First regional discovery adapter
 - [x] Typecheck/test CI workflow
+- [x] Release packaging workflow
+- [x] v0.2.0 package structure validated
 - [ ] More regional profiles
 - [ ] Top artists / albums / playlists adapters
 - [ ] Personalization/history integration
 - [ ] Spotify-inspired dashboard presentation
-- [ ] Local installation package
-- [ ] GitHub Release automation
 - [ ] Nuclear Plugin Registry submission
 
 ## License
