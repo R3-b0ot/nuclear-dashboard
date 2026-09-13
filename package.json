@@ -8,8 +8,8 @@
   "type": "module",
   "nuclear": {
     "displayName": "Nuclear Dashboard",
-    "category": "discovery",
-    "permissions": []
+    "category": "other",
+    "permissions": ["network", "storage"]
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
