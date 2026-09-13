@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
       - run: npm install
       - run: npm run typecheck
       - run: npm test
@@ -23,6 +22,7 @@ jobs:
         run: |
           rm -f plugin.zip
           zip -r plugin.zip package.json src README.md LICENSE
+          unzip -l plugin.zip
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
