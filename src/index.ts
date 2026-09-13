@@ -1,50 +1,49 @@
-import type {
-  DashboardProvider,
-  NuclearPlugin,
-  NuclearPluginAPI,
-} from '@nuclearplayer/plugin-sdk';
-
-/**
- * Region is intentionally independent from the provider implementation.
- * The first profile is India; more markets can be added without changing
- * the dashboard contract.
- */
-export type DashboardRegion = {
-  id: string;
-  countryCode: string;
-  name: string;
-  languages: string[];
-};
-
-export const DEFAULT_REGION: DashboardRegion = {
-  id: 'india',
-  countryCode: 'IN',
-  name: 'India',
-  languages: ['hi', 'mr', 'pa', 'ta', 'te', 'bn', 'gu', 'kn', 'ml'],
-};
+import type { DashboardProvider, NuclearPlugin, NuclearPluginAPI } from '@nuclearplayer/plugin-sdk';
+import { DeezerDiscoveryClient } from './deezer';
+import { DEFAULT_REGION, getRegion } from './regions';
 
 const PROVIDER_ID = 'nuclear-dashboard';
+const REGION_SETTING = 'region';
 
-/**
- * Phase 1 provider.
- *
- * Nuclear currently renders dashboard provider capabilities itself. This
- * provider establishes the regional dashboard contract first; data adapters
- * will be added independently so the UI is not coupled to one service.
- */
-const provider: DashboardProvider = {
+const createProvider = (client: DeezerDiscoveryClient, regionId: string): DashboardProvider => ({
   id: PROVIDER_ID,
   kind: 'dashboard',
   name: 'Nuclear Dashboard',
-  capabilities: [],
-};
+  capabilities: ['topTracks'],
+  async fetchTopTracks() {
+    return client.discoverRegion(getRegion(regionId).discoveryQueries, 5);
+  },
+});
+
+let unsubscribeRegion: (() => void) | undefined;
 
 const plugin: NuclearPlugin = {
-  onEnable(api: NuclearPluginAPI) {
-    api.Providers.register(provider);
+  async onEnable(api: NuclearPluginAPI) {
+    await api.Settings.register([{
+      id: REGION_SETTING,
+      title: 'Dashboard region',
+      description: 'Choose the market used for regional discovery content.',
+      category: 'Dashboard',
+      kind: 'enum',
+      options: [{ value: DEFAULT_REGION.id, label: DEFAULT_REGION.name }],
+      default: DEFAULT_REGION.id,
+      widget: { type: 'select' },
+    }]);
+
+    let regionId = (await api.Settings.get<string>(REGION_SETTING)) ?? DEFAULT_REGION.id;
+    const client = new DeezerDiscoveryClient(api.Http.fetch);
+    api.Providers.register(createProvider(client, regionId));
+
+    unsubscribeRegion = api.Settings.subscribe<string>(REGION_SETTING, (value) => {
+      regionId = value ?? DEFAULT_REGION.id;
+      api.Providers.unregister(PROVIDER_ID);
+      api.Providers.register(createProvider(client, regionId));
+    });
   },
 
   onDisable(api: NuclearPluginAPI) {
+    unsubscribeRegion?.();
+    unsubscribeRegion = undefined;
     api.Providers.unregister(PROVIDER_ID);
   },
 };
