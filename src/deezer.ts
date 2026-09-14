@@ -13,7 +13,11 @@ type DeezerTrack = {
 };
 
 type DeezerSearchResponse<T> = { data?: T[] };
-type Logger = { error(message: string): void; warn(message: string): void };
+type Logger = {
+  info(message: string): void;
+  error(message: string): void;
+  warn(message: string): void;
+};
 
 export class DeezerDiscoveryClient {
   constructor(
@@ -24,6 +28,7 @@ export class DeezerDiscoveryClient {
   async searchTracks(query: string, limit = 10): Promise<Track[]> {
     const encoded = encodeURIComponent(query);
     const url = `${API_BASE}/search/track?q=${encoded}&limit=${limit}`;
+    this.logger?.info(`Deezer request: ${query}`);
     const response = await this.fetch(url);
 
     if (!response.ok) {
@@ -40,32 +45,34 @@ export class DeezerDiscoveryClient {
       throw new Error('Deezer response did not contain a data array');
     }
 
+    this.logger?.info(`Deezer response: ${query} -> ${payload.data.length} tracks`);
     return payload.data.map(mapTrack);
   }
 
   async discoverRegion(queries: string[], perQuery = 6): Promise<Track[]> {
-    const results = await Promise.allSettled(
-      queries.map((query) => this.searchTracks(query, perQuery)),
-    );
+    this.logger?.info(`Starting Deezer discovery: ${queries.length} queries`);
     const seen = new Set<string>();
     const tracks: Track[] = [];
 
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
+    // Keep requests sequential. A burst of many simultaneous requests can be
+    // throttled by the upstream API or by the host HTTP bridge.
+    for (const query of queries) {
+      try {
+        const results = await this.searchTracks(query, perQuery);
+        for (const track of results) {
+          const key = `${track.artists[0]?.name ?? ''}:${track.title}`.toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          tracks.push(track);
+        }
+      } catch (error) {
         this.logger?.warn(
-          `Skipping failed Deezer discovery query "${queries[index]}": ${String(result.reason)}`,
+          `Skipping failed Deezer discovery query "${query}": ${String(error)}`,
         );
-        return;
       }
+    }
 
-      for (const track of result.value) {
-        const key = `${track.artists[0]?.name ?? ''}:${track.title}`.toLowerCase();
-        if (seen.has(key)) continue;
-        seen.add(key);
-        tracks.push(track);
-      }
-    });
-
+    this.logger?.info(`Deezer discovery complete: ${tracks.length} unique tracks`);
     return tracks;
   }
 }
