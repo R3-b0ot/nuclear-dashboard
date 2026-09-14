@@ -1,6 +1,6 @@
 {
   "name": "nuclear-dashboard",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Spotify-inspired, region-aware discovery dashboard provider for Nuclear Music Player.",
   "author": "R3-b0ot",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "nuclear": {
     "displayName": "Nuclear Dashboard",
     "category": "other",
-    "permissions": ["network", "storage"]
+    "permissions": []
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
