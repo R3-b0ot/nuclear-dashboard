@@ -31,7 +31,7 @@ const plugin: NuclearPlugin = {
     }]);
 
     let regionId = (await api.Settings.get<string>(REGION_SETTING)) ?? DEFAULT_REGION.id;
-    const client = new DeezerDiscoveryClient(api.Http.fetch);
+    const client = new DeezerDiscoveryClient(api.Http.fetch, api.Logger);
     api.Providers.register(createProvider(client, regionId));
 
     unsubscribeRegion = api.Settings.subscribe<string>(REGION_SETTING, (value) => {
